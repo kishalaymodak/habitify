@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession();
   console.log(session);
 
-  const { taskId } = await req.json();
+  const { taskId, today } = await req.json();
   try {
     if (!session?.user?.email) {
       return NextResponse.json(
@@ -16,8 +16,10 @@ export async function POST(req: NextRequest) {
         { status: 403 }
       );
     }
-    const day = new Date();
-    const today = day.toLocaleString("en-CA").slice(0, 10);
+    // const day = new Date();
+    // const today = day.toLocaleString("en-CA").slice(0, 10);
+    console.log(today);
+
     const tasks = await prisma.taskActivity.findFirst({
       where: {
         taskId: taskId,

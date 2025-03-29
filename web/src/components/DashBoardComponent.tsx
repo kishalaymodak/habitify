@@ -41,8 +41,12 @@ function DashBoardComponent() {
   }
   const markTaskDone = useCallback(
     async (taskId: string) => {
+      const date = new Date();
+      const today = date.toLocaleString("en-CA").slice(0, 10);
+      console.log(today);
+
       try {
-        await axios.post("/api/taskActivity", { taskId });
+        await axios.post("/api/taskActivity", { taskId, today });
         getData();
       } catch (error) {
         console.error("Error marking task done", error);
