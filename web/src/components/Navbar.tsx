@@ -1,11 +1,12 @@
 "use client";
 import React from "react";
 import { Button } from "./ui/button";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import NavAvatar from "./NavAvatar";
 
 function Navbar() {
   const session = useSession();
-
+  const image = session.data?.user?.image;
   return (
     <div>
       <div className=" bg-muted">
@@ -23,15 +24,20 @@ function Navbar() {
                 </Button>
               )}
               {session.data && (
-                <Button
-                  onClick={() => {
-                    signOut();
-                  }}
-                  variant="outline"
-                  className="hidden sm:inline-flex"
-                >
-                  Log out
-                </Button>
+                <NavAvatar
+                  image={image || ""}
+                  name={session.data.user?.email?.at(0)?.toUpperCase() || ""}
+                />
+
+                // <Button
+                //   onClick={() => {
+                //     signOut();
+                //   }}
+                //   variant="outline"
+                //   className="hidden sm:inline-flex"
+                // >
+                //   Log out
+                // </Button>
               )}
             </div>
           </div>

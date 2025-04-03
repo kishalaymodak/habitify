@@ -29,8 +29,8 @@ function DashBoardComponent() {
     if (!task.trim() || !description.trim()) return;
     try {
       await axios.post("/api/tasks", {
-        taskName: task,
-        taskDescriotion: description,
+        taskName: task.trim(),
+        taskDescriotion: description.trim(),
       });
       getData();
       setTask("");
