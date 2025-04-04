@@ -17,7 +17,9 @@ const handler = NextAuth({
         Password: { label: "Password", type: "password", placeholder: "" },
       },
       async authorize(credentials: Credentials | undefined) {
-        if (!credentials || !credentials.Email || credentials.Password) {
+        console.log(credentials?.Password);
+
+        if (!credentials || !credentials.Email || !credentials.Password) {
           throw new Error("email and password are requred");
         }
 

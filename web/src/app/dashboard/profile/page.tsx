@@ -11,8 +11,6 @@ import { toast } from "sonner";
 
 function Profile() {
   const session = useSession();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [changePassword, setChangePassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordIcon, setPasswordIcon] = useState(false);
@@ -20,12 +18,8 @@ function Profile() {
   if (!session.data) {
     redirect("/");
   }
+  const email = session.data.user?.email;
 
-  async function getData() {
-    const data = await axios.get("/api/profile");
-    setEmail(data.data.email);
-    setPassword(data.data.password);
-  }
   async function PasswordChanger() {
     if (!changePassword.trim() || !confirmPassword.trim()) {
       toast.warning("Change Password or Confirm Password fields are empty !!!");
@@ -42,7 +36,7 @@ function Profile() {
         confirmPassword,
       });
       toast.success("Password change successfully done !!");
-      getData();
+
       setChangePassword("");
       setConfirmPassword("");
     } catch (error) {
@@ -51,9 +45,7 @@ function Profile() {
     }
   }
 
-  useEffect(() => {
-    getData();
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <div>
@@ -67,20 +59,22 @@ function Profile() {
             <h2 className="text-xl">Email Address:</h2>
             <Input
               disabled
-              defaultValue={email}
+              defaultValue={email || ""}
               className="w-3/5"
               type="text"
             />
           </div>
           <div className=" flex flex-col gap-4 pt-4">
             <div className="flex flex-col gap-2">
-              <h2 className="text-xl">Current Password</h2>
+              <h2 className="text-xl">New Password</h2>
               <div className="flex gap-4 items-center ">
                 <Input
-                  disabled
-                  defaultValue={password}
+                  defaultValue={changePassword}
                   type={passwordIcon ? "text" : "password"}
                   className="w-3/5"
+                  onChange={(e) => {
+                    setChangePassword(e.target.value);
+                  }}
                 />
                 <span
                   onClick={() => {
@@ -90,17 +84,6 @@ function Profile() {
                   {passwordIcon ? <Eye /> : <EyeOff />}
                 </span>
               </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <h2 className="text-xl">New Password</h2>
-              <Input
-                type="password"
-                value={changePassword}
-                onChange={(e) => {
-                  setChangePassword(e.target.value);
-                }}
-                className="w-3/5"
-              />
             </div>
             <div className="flex flex-col gap-2">
               <h2 className="text-xl">Confirm New Password</h2>
