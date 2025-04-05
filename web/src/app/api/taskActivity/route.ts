@@ -45,13 +45,13 @@ export async function POST(req: NextRequest) {
           },
         });
         return NextResponse.json({
-          message: "task undone",
+          message: "Task Marked Undone",
           task: deleatedActivity,
         });
       }
 
       return NextResponse.json({
-        message: "task undone",
+        message: "Task Marked Undone",
         task: updatedTask,
       });
     }
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
       },
     });
     return NextResponse.json({
-      message: "task Done",
+      message: "Task Marked Done",
       activity: res,
     });
   } catch (error) {

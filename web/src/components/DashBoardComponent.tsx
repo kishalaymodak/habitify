@@ -1,41 +1,72 @@
 "use client";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import axios from "axios";
 import HeatMap from "./HeatMap";
 import { TasksResponse } from "@/lib/types";
-import { Trash2 } from "lucide-react";
+import { PlusIcon, Trash2 } from "lucide-react";
+import { Component } from "./MonthlyChart";
+
+import { toast } from "sonner";
+
 function DashBoardComponent() {
   const [task, setTask] = useState("");
   const [description, setDescription] = useState("");
-  const [data, setData] = useState<TasksResponse>([]);
+  const [taskData, setTaskData] = useState<TasksResponse>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const getData = useCallback(async () => {
     try {
       const res = await axios.get("/api/tasks");
 
-      setData(res.data.tasks);
+      setTaskData(res.data.tasks);
     } catch (error) {
+      toast.error("Error in Featching Tasks !!");
       console.error("Error fetching tasks:", error);
     }
   }, []);
 
   useEffect(() => {
     getData();
+    toast.message("Welcome To Habitify !!");
   }, [getData]);
 
   async function CreateTasks() {
-    if (!task.trim() || !description.trim()) return;
+    if (!task.trim() || !description.trim()) {
+      toast.error("Task Name or Description is Empty !!");
+      return;
+    }
+
     try {
       await axios.post("/api/tasks", {
         taskName: task.trim(),
         taskDescriotion: description.trim(),
       });
+      toast.success("Task Created !!");
       getData();
       setTask("");
       setDescription("");
     } catch (error) {
+      toast.error("Error In Task Creation !!");
       console.error("error ctreating Tasks", error);
     }
   }
@@ -46,13 +77,16 @@ function DashBoardComponent() {
       console.log(today);
 
       try {
-        await axios.post("/api/taskActivity", { taskId, today });
+        const res = await axios.post("/api/taskActivity", { taskId, today });
         getData();
+
+        toast.success(res.data.message);
       } catch (error) {
+        toast.error("Error in Marking Task Done");
         console.error("Error marking task done", error);
       }
     },
-    [data]
+    [taskData]
   );
 
   const deleteTask = async (taskId: string) => {
@@ -60,8 +94,10 @@ function DashBoardComponent() {
       await axios.delete("/api/tasks", {
         data: { taskId },
       });
+      toast.success("Task Deleted !!");
       getData();
     } catch (error) {
+      toast.error("Error in Deleting Task !!");
       console.error("Error deleting task:", error);
     }
   };
@@ -77,37 +113,77 @@ function DashBoardComponent() {
   }, []);
   return (
     <div>
-      <div className="pt-14 max-w-screen">
+      <div className=" relative pt-14 max-w-screen ">
         <div className="max-w-screen-xl mx-auto flex flex-col gap-4 justify-center">
-          <Input
-            className="md:text-lg text-center h-12 font-medium"
-            name="Task"
-            placeholder="Task Name"
-            value={task}
-            onChange={(e) => {
-              setTask(e.target.value);
-            }}
-          />
-          <Input
-            className="md:text-lg text-center h-12 font-medium"
-            name="Description"
-            placeholder="Task Description"
-            value={description}
-            onChange={(e) => {
-              setDescription(e.target.value);
-            }}
-          />
-          <Button
-            onClick={() => {
-              CreateTasks();
-            }}
-            className="h-12 text-lg"
-          >
-            Create Task
-          </Button>
+          <MemoizedChart tasks={taskData} />
+          {/* <div className=" fixed z-[999] bottom-2/15 right-2/15">
+            <Button className="md:h-15 h-12 w-12 md:w-15">
+              <PlusIcon size={24} className="h-10 text-3xl w-10" />
+            </Button>
+          </div> */}
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <div className="fixed z-[999] bottom-2/15 right-2/15">
+                <Button className="md:h-15 h-12 w-12 md:w-15">
+                  <PlusIcon size={24} className="h-10 text-3xl w-10" />
+                </Button>
+              </div>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Create Habbit</DialogTitle>
+                <DialogDescription>
+                  Create task and track them to create a habbit.
+                </DialogDescription>
+              </DialogHeader>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  CreateTasks();
+                }}
+              >
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Task Name
+                    </Label>
+                    <Input
+                      id="name"
+                      name="Task"
+                      placeholder="Task Name"
+                      value={task}
+                      onChange={(e) => {
+                        setTask(e.target.value);
+                      }}
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="username" className="text-right">
+                      Description
+                    </Label>
+                    <Input
+                      id="username"
+                      name="Description"
+                      placeholder="Task Description"
+                      value={description}
+                      onChange={(e) => {
+                        setDescription(e.target.value);
+                      }}
+                      className="col-span-3"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button type="submit">Create Task</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
 
-        {data.map((data) => {
+        {taskData.map((data) => {
           return (
             <div
               key={data.id}
@@ -134,11 +210,20 @@ function DashBoardComponent() {
                   </Button>
                 </div>
               </div>
-              <MemoizedHeatMap
-                startDay={startDay}
-                endDay={endDay}
-                data={data.taskActivity}
-              />
+              <div
+                ref={containerRef}
+                className="w-full overflow-x-auto scroll-smooth"
+              >
+                <div className=" min-w-max">
+                  <div className="">
+                    <MemoizedHeatMap
+                      startDay={startDay}
+                      endDay={endDay}
+                      data={data.taskActivity}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           );
         })}
@@ -146,6 +231,7 @@ function DashBoardComponent() {
     </div>
   );
 }
+const MemoizedChart = React.memo(Component);
 const MemoizedHeatMap = React.memo(HeatMap);
 
 export default DashBoardComponent;
