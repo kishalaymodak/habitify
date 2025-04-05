@@ -113,7 +113,7 @@ function DashBoardComponent() {
   }, []);
   return (
     <div>
-      <div className=" relative pt-14 max-w-screen ">
+      <div className="relative pt-14 max-w-screen ">
         <div className="max-w-screen-xl mx-auto flex flex-col gap-4 justify-center">
           <MemoizedChart tasks={taskData} />
           {/* <div className=" fixed z-[999] bottom-2/15 right-2/15">
@@ -125,8 +125,8 @@ function DashBoardComponent() {
           <Dialog>
             <DialogTrigger asChild>
               <div className="fixed z-[999] bottom-2/15 right-2/15">
-                <Button className="md:h-15 h-12 w-12 md:w-15">
-                  <PlusIcon size={24} className="h-10 text-3xl w-10" />
+                <Button className="md:h-15 text-5xl text-center font-light h-12 w-12 md:w-15 bg-purple-300">
+                  <PlusIcon />
                 </Button>
               </div>
             </DialogTrigger>
