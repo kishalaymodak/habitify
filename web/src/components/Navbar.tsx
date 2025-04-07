@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "./ui/button";
 import { signIn, useSession } from "next-auth/react";
 import NavAvatar from "./NavAvatar";
+import Link from "next/link";
 
 function Navbar() {
   const session = useSession();
@@ -12,7 +13,9 @@ function Navbar() {
       <div className=" bg-muted">
         <nav className="h-16 bg-background border-b">
           <div className="h-full flex items-center justify-between max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-2xl font-semibold">Habitify</h1>
+            <Link href={"/"}>
+              <h1 className="text-2xl font-semibold">Habitify</h1>
+            </Link>
             <div className="flex items-center gap-3">
               {!session.data && (
                 <Button

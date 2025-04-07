@@ -9,9 +9,9 @@ export function Landing() {
   const router = useRouter();
   const session = useSession();
   useEffect(() => {
-    if (session.data?.user) {
-      router.push("/dashboard");
-    }
+    // if (session.data?.user) {
+    //   // router.push("/dashboard");
+    // }
   }, [session.status, router]);
 
   return (
